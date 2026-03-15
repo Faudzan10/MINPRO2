@@ -71,66 +71,87 @@ Beberapa widget Flutter yang digunakan dalam aplikasi ini antara lain:
 
 ============================================================================================================
 
-**ALUR PROGRAM**
+## ALUR PROGRAM
 
-## Tampilan Aplikasi
+Berikut adalah alur penggunaan aplikasi **PetCare Shelter** dari awal hingga pengelolaan data hewan adopsi.
 
-Tampilan awal light mode
+---
 
-![PetCare Shelter](lightmode.png)
+### 1. Tampilan Awal (Light Mode)
 
+Saat aplikasi dibuka, pengguna akan melihat halaman utama aplikasi dengan tampilan **mode terang**.
 
+![Tampilan Awal Light Mode](lightmode.png)
 
-Tampilan awal dark mode
+---
 
-![PetCare Shelter](darkmode.png)
+### 2. Tampilan Awal (Dark Mode)
 
+Pengguna dapat mengganti tampilan aplikasi menjadi **mode gelap** menggunakan tombol switch pada bagian atas aplikasi.
 
+![Tampilan Awal Dark Mode](darkmode.png)
 
-Isi data
+---
 
-![PetCare Shelter](isidata.png)
+### 3. Menambahkan Data Hewan
 
+Pengguna dapat menambahkan data hewan yang akan diadopsi melalui halaman form input.
 
+![Form Input Data](isidata.png)
 
-Lihat data
+---
 
-![PetCare Shelter](lihatdata.png)
+### 4. Melihat Daftar Hewan
 
+Setelah data disimpan, pengguna dapat melihat daftar hewan yang tersedia untuk diadopsi.
 
+![Daftar Hewan Adopsi](lihatdata.png)
 
-Data supabase
+---
 
-![PetCare Shelter](supabaseterbuat.png)
+### 5. Data Tersimpan di Supabase
 
+Data yang dimasukkan pada aplikasi akan tersimpan pada **database Supabase**.
 
+![Data di Supabase](supabaseterbuat.png)
 
-Update data
+---
 
-![PetCare Shelter](update.png)
+### 6. Mengupdate Data Hewan
 
+Pengguna dapat mengedit atau memperbarui data hewan yang sudah tersimpan.
 
+![Update Data](update.png)
 
-Update data supabase
+---
 
-![PetCare Shelter](updatesupabase.png)
+### 7. Update Data di Supabase
 
+Perubahan data pada aplikasi akan langsung diperbarui pada database Supabase.
 
+![Update di Supabase](updatesupabase.png)
 
-Hapus data
+---
 
-![PetCare Shelter](hapus.png)
+### 8. Menghapus Data Hewan
 
+Pengguna juga dapat menghapus data hewan yang sudah tidak tersedia untuk diadopsi.
 
+![Hapus Data](hapus.png)
 
-Hapus data supabase
+---
 
-![PetCare Shelter](hapussupabase.png)
+### 9. Data Terhapus di Supabase
 
+Setelah dihapus, data tersebut juga akan terhapus dari database Supabase.
 
+![Hapus di Supabase](hapussupabase.png)
 
-Input kosong
+---
 
-![PetCare Shelter](inputkosong.png)
+### 10. Validasi Input
 
+Jika pengguna mencoba menyimpan data dengan form kosong, aplikasi akan menampilkan peringatan validasi.
+
+![Validasi Input](inputkosong.png)
 
