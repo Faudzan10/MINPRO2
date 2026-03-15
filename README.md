@@ -75,4 +75,12 @@ Beberapa widget Flutter yang digunakan dalam aplikasi ini antara lain:
 
 ## Tampilan Aplikasi
 
+Tampilan awal light mode
+
 ![PetCare Shelter](lightmode.png)
+
+
+Tampilan awal dark mode
+
+![PetCare Shelter](darkmode.png)
+
