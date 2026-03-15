@@ -69,7 +69,7 @@ Beberapa widget Flutter yang digunakan dalam aplikasi ini antara lain:
 - Navigator
 - SizedBox
 
-==========================================================================================
+============================================================================================
 
 ## ALUR PROGRAM
 
