@@ -1,301 +1,363 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
-  runApp(PetCareApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://omzsotkkshclrpmytifl.supabase.co',
+    anonKey: 'sb_publishable_ryqKnr0d4HwTwuSVxGj7FA_NpYINCb6',
+  );
+
+  runApp(const MyApp());
 }
 
-class PetCareApp extends StatelessWidget {
+final supabase = Supabase.instance.client;
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool isDark = false;
+
+  void toggleTheme() {
+    setState(() {
+      isDark = !isDark;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'PetCare Shelter',
-      theme: ThemeData(primarySwatch: Colors.teal),
-      home: HomePage(),
+
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        scaffoldBackgroundColor: const Color(0xfff4f6fa),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+        ),
+      ),
+
+      darkTheme: ThemeData.dark(),
+
+      themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+
+      home: HomePage(isDark: isDark, toggleTheme: toggleTheme),
     );
   }
 }
 
-class Pet {
-  String id;
-  String kategori;
-  String jenis;
-  String warna;
-  String lokasi;
-  String kontak;
+class HomePage extends StatelessWidget {
+  final bool isDark;
+  final VoidCallback toggleTheme;
 
-  Pet({
-    required this.id,
-    required this.kategori,
-    required this.jenis,
-    required this.warna,
-    required this.lokasi,
-    required this.kontak,
-  });
-}
-
-class HomePage extends StatefulWidget {
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  List<Pet> petList = [];
-  int counter = 1;
-
-  String generateId(String jenis) {
-    String prefix = jenis.substring(0, 3).toUpperCase();
-    return "$prefix${counter.toString().padLeft(3, '0')}";
-  }
-
-  void tambahPet(Pet pet) {
-    setState(() {
-      petList.add(pet);
-      counter++;
-    });
-  }
-
-  void updatePet(int index, Pet pet) {
-    setState(() {
-      petList[index] = pet;
-    });
-  }
-
-  void hapusPet(int index) {
-    setState(() {
-      petList.removeAt(index);
-    });
-  }
+  const HomePage({super.key, required this.isDark, required this.toggleTheme});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("PetCare Shelter 🐾"),
+        title: const Text("PetCare Shelter"),
         centerTitle: true,
-        backgroundColor: Colors.teal,
+        actions: [
+          Switch(
+            value: isDark,
+            onChanged: (value) {
+              toggleTheme();
+            },
+          ),
+        ],
       ),
-      body: petList.isEmpty
-          ? Center(
-              child: Text(
-                "Belum ada data hewan",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.teal,
+
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.pets, size: 80, color: Colors.blue),
+
+              const SizedBox(height: 20),
+
+              const Text(
+                "Adopsi Hewan",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+
+              const SizedBox(height: 40),
+
+              SizedBox(
+                width: double.infinity,
+                height: 55,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.add),
+                  label: const Text(
+                    "Tambah Hewan Adopsi",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const FormPage()),
+                    );
+                  },
                 ),
               ),
-            )
+
+              const SizedBox(height: 20),
+
+              SizedBox(
+                width: double.infinity,
+                height: 55,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.list),
+                  label: const Text(
+                    "Lihat Daftar Adopsi",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ListPage()),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ListPage extends StatefulWidget {
+  const ListPage({super.key});
+
+  @override
+  State<ListPage> createState() => _ListPageState();
+}
+
+class _ListPageState extends State<ListPage> {
+  List pets = [];
+
+  Future getPets() async {
+    final data = await supabase.from('pets').select();
+
+    setState(() {
+      pets = data;
+    });
+  }
+
+  Future deletePet(String id) async {
+    await supabase.from('pets').delete().eq('id', id);
+
+    getPets();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getPets();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Daftar Adopsi")),
+
+      body: pets.isEmpty
+          ? const Center(child: Text("Belum ada data"))
           : ListView.builder(
-              itemCount: petList.length,
+              itemCount: pets.length,
               itemBuilder: (context, index) {
-                Pet pet = petList[index];
+                final pet = pets[index];
+
                 return Card(
-                  margin: EdgeInsets.all(10),
+                  elevation: 4,
+                  margin: const EdgeInsets.all(12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                   child: ListTile(
-                    leading: Icon(Icons.pets, color: Colors.teal),
+                    leading: const CircleAvatar(child: Icon(Icons.pets)),
+
                     title: Text(
-                      pet.jenis,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      pet['jenis'],
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
+
                     subtitle: Text(
-                      "ID: ${pet.id}\nKategori: ${pet.kategori}\nWarna: ${pet.warna}\nLokasi: ${pet.lokasi}\nKontak: ${pet.kontak}",
+                      "Kategori: ${pet['kategori']}\n"
+                      "Warna: ${pet['warna']}\n"
+                      "Lokasi: ${pet['lokasi']}\n"
+                      "Kontak: ${pet['kontak']}",
                     ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddPetPage(
-                            onAdd: (updatedPet) {
-                              updatePet(index, updatedPet);
-                            },
-                            generateId: generateId,
-                            existingPet: pet,
-                          ),
+
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.orange),
+                          onPressed: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => FormPage(pet: pet),
+                              ),
+                            );
+
+                            getPets();
+                          },
                         ),
-                      );
-                    },
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
-                      onPressed: () {
-                        hapusPet(index);
-                      },
+
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () {
+                            deletePet(pet['id']);
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 );
               },
             ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.teal,
-        child: Icon(Icons.add),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  AddPetPage(onAdd: tambahPet, generateId: generateId),
-            ),
-          );
-        },
-      ),
     );
   }
 }
 
-class AddPetPage extends StatefulWidget {
-  final Function(Pet) onAdd;
-  final String Function(String) generateId;
-  final Pet? existingPet;
+class FormPage extends StatefulWidget {
+  final Map? pet;
 
-  AddPetPage({required this.onAdd, required this.generateId, this.existingPet});
+  const FormPage({super.key, this.pet});
 
   @override
-  State<AddPetPage> createState() => _AddPetPageState();
+  State<FormPage> createState() => _FormPageState();
 }
 
-class _AddPetPageState extends State<AddPetPage> {
+class _FormPageState extends State<FormPage> {
   final _formKey = GlobalKey<FormState>();
 
-  TextEditingController warnaController = TextEditingController();
-  TextEditingController lokasiController = TextEditingController();
-  TextEditingController kontakController = TextEditingController();
+  final kategori = TextEditingController();
+  final jenis = TextEditingController();
+  final warna = TextEditingController();
+  final lokasi = TextEditingController();
+  final kontak = TextEditingController();
 
-  String selectedKategori = "Mamalia";
-  String selectedJenis = "Anjing";
-
-  Map<String, List<String>> kategoriMap = {
-    "Mamalia": [
-      "Anjing",
-      "Kucing",
-      "Kelinci",
-      "Hamster",
-      "Marmut",
-      "Sugar Glider",
-    ],
-    "Reptil": ["Ular", "Iguana", "Kura-kura"],
-    "Unggas": ["Ayam", "Bebek", "Burung"],
-  };
+  bool get isEdit => widget.pet != null;
 
   @override
   void initState() {
     super.initState();
 
-    if (widget.existingPet != null) {
-      selectedKategori = widget.existingPet!.kategori;
-      selectedJenis = widget.existingPet!.jenis;
-      warnaController.text = widget.existingPet!.warna;
-      lokasiController.text = widget.existingPet!.lokasi;
-      kontakController.text = widget.existingPet!.kontak;
+    if (isEdit) {
+      kategori.text = widget.pet!['kategori'];
+      jenis.text = widget.pet!['jenis'];
+      warna.text = widget.pet!['warna'];
+      lokasi.text = widget.pet!['lokasi'];
+      kontak.text = widget.pet!['kontak'];
     }
+  }
+
+  Future savePet() async {
+    if (_formKey.currentState!.validate()) {
+      if (isEdit) {
+        await supabase
+            .from('pets')
+            .update({
+              'kategori': kategori.text,
+              'jenis': jenis.text,
+              'warna': warna.text,
+              'lokasi': lokasi.text,
+              'kontak': kontak.text,
+            })
+            .eq('id', widget.pet!['id']);
+      } else {
+        await supabase.from('pets').insert({
+          'kategori': kategori.text,
+          'jenis': jenis.text,
+          'warna': warna.text,
+          'lokasi': lokasi.text,
+          'kontak': kontak.text,
+        });
+      }
+
+      Navigator.pop(context);
+    }
+  }
+
+  Widget input(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return "$label tidak boleh kosong";
+          }
+          return null;
+        },
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isEdit = widget.existingPet != null;
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text(isEdit ? "Edit Hewan" : "Tambah Hewan"),
-        backgroundColor: Colors.teal,
-      ),
+      appBar: AppBar(title: Text(isEdit ? "Edit Hewan" : "Tambah Hewan")),
+
       body: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
+
         child: Form(
           key: _formKey,
+
           child: ListView(
             children: [
-              DropdownButtonFormField(
-                value: selectedKategori,
-                decoration: InputDecoration(
-                  labelText: "Kategori Hewan",
-                  border: OutlineInputBorder(),
-                ),
-                items: kategoriMap.keys.map((kategori) {
-                  return DropdownMenuItem(
-                    value: kategori,
-                    child: Text(kategori),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedKategori = value.toString();
-                    selectedJenis = kategoriMap[selectedKategori]!.first;
-                  });
-                },
-              ),
-              SizedBox(height: 15),
-              DropdownButtonFormField(
-                value: selectedJenis,
-                decoration: InputDecoration(
-                  labelText: "Jenis Hewan",
-                  border: OutlineInputBorder(),
-                ),
-                items: kategoriMap[selectedKategori]!
-                    .map(
-                      (jenis) =>
-                          DropdownMenuItem(value: jenis, child: Text(jenis)),
-                    )
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedJenis = value.toString();
-                  });
-                },
-              ),
-              SizedBox(height: 15),
-              TextFormField(
-                controller: warnaController,
-                decoration: InputDecoration(
-                  labelText: "Warna",
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) =>
-                    value!.isEmpty ? "Warna tidak boleh kosong" : null,
-              ),
-              SizedBox(height: 15),
-              TextFormField(
-                controller: lokasiController,
-                decoration: InputDecoration(
-                  labelText: "Lokasi Shelter",
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) =>
-                    value!.isEmpty ? "Lokasi tidak boleh kosong" : null,
-              ),
-              SizedBox(height: 15),
-              TextFormField(
-                controller: kontakController,
-                decoration: InputDecoration(
-                  labelText: "Kontak",
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) =>
-                    value!.isEmpty ? "Kontak tidak boleh kosong" : null,
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    String idBaru = isEdit
-                        ? widget.existingPet!.id
-                        : widget.generateId(selectedJenis);
+              input("Kategori", kategori),
+              input("Jenis", jenis),
+              input("Warna", warna),
+              input("Lokasi", lokasi),
+              input("Kontak", kontak),
 
-                    widget.onAdd(
-                      Pet(
-                        id: idBaru,
-                        kategori: selectedKategori,
-                        jenis: selectedJenis,
-                        warna: warnaController.text,
-                        lokasi: lokasiController.text,
-                        kontak: kontakController.text,
-                      ),
-                    );
+              const SizedBox(height: 10),
 
-                    Navigator.pop(context);
-                  }
-                },
-                child: Text(isEdit ? "Update" : "Simpan"),
+              SizedBox(
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: savePet,
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  child: Text(
+                    isEdit ? "Update Data" : "Simpan Data",
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ),
               ),
             ],
           ),
