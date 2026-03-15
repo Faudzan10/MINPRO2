@@ -73,3 +73,6 @@ Beberapa widget Flutter yang digunakan dalam aplikasi ini antara lain:
 
 **ALUR PROGRAM**
 
+## Tampilan Aplikasi
+
+![PetCare Shelter](Screenshot%202026-03-15%20131643.png)
