@@ -80,7 +80,57 @@ Tampilan awal light mode
 ![PetCare Shelter](lightmode.png)
 
 
+
 Tampilan awal dark mode
 
 ![PetCare Shelter](darkmode.png)
+
+
+
+Isi data
+
+![PetCare Shelter](isidata.png)
+
+
+
+Lihat data
+
+![PetCare Shelter](lihatdata.png)
+
+
+
+Data supabase
+
+![PetCare Shelter](supabaseterbuat.png)
+
+
+
+Update data
+
+![PetCare Shelter](update.png)
+
+
+
+Update data supabase
+
+![PetCare Shelter](updatesupabase.png)
+
+
+
+Hapus data
+
+![PetCare Shelter](hapus.png)
+
+
+
+Hapus data supabase
+
+![PetCare Shelter](hapussupabase.png)
+
+
+
+Input kosong
+
+![PetCare Shelter](inputkosong.png)
+
 
